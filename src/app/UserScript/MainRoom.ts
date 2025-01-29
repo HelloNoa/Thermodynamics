@@ -15,7 +15,7 @@ export class MainRoom extends Room {
   Awake(): void {
     // Room.prototype.Awake.call(this);
     super.Awake();
-    this.init();
+    // this.init();
     // this.test2();
     // const x = 64;
     // const y = 64;

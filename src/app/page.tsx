@@ -27,6 +27,7 @@ export default function Home() {
     
     
     const game = new Game();
+    Global.game = game;
     game.gameTickSpeed = 100;
     const _mainRoom = new MainRoom({ roomManager: game.RoomManager });
     game.RoomManager.AddRoom({
@@ -95,6 +96,32 @@ export default function Home() {
           </canvas>
           <p className={styles.degree}>{degree.toLocaleString()}°C <br/>{specificHeat.toLocaleString()}J/kg·℃</p>
         </div>
+        <ul>
+          {new Array(3).fill(0)
+                       .map((_, i) => {
+                         return <li key={i}>
+                           <button onClick={() => {
+                             const game = Global.game;
+                             Global.ResetMap();
+                             switch (i) {
+                               case 0:
+                                 game.RoomManager.CurrentRoom.RemoveAllGameObjects();
+                                 break;
+                               case 1:
+                                 game.RoomManager.CurrentRoom.RemoveAllGameObjects();
+                                 (game.RoomManager.CurrentRoom as MainRoom).init();
+                                 break;
+                               case 2:
+                                 game.RoomManager.CurrentRoom.RemoveAllGameObjects();
+                                 (game.RoomManager.CurrentRoom as MainRoom).test2();
+                                 break;
+                               default:
+                                 break;
+                             }
+                           }}>Case {i + 1}</button>
+                         </li>;
+                       })}
+        </ul>
       </main>
     </div>
   );

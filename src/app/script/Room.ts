@@ -112,6 +112,10 @@ export class Room extends GameObject {
     // console.log(gameObject);
   }
   
+  public RemoveAllGameObjects() {
+    this._gameObjects = [];
+  }
+  
   get RoomName() {
     return this.name;
   }
