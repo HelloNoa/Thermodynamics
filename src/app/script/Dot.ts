@@ -128,10 +128,10 @@ export class Dot extends GameObject {
               // this.setTemperature = this.getTemperature - (_v * (1 / this.specificHeat));
               // _dot.setTemperature = _dot.getTemperature + (_v * (1 / _dot.specificHeat));
               this.setTemperature = this.getTemperature - (_v / this.specificHeat);
-              _dot.setTemperature = _dot.getTemperature + (_v / this.specificHeat);
+              _dot.setTemperature = _dot.getTemperature + (_v / _dot.specificHeat);
             } else {
               this.setTemperature = this.getTemperature + (_v / this.specificHeat);
-              _dot.setTemperature = _dot.getTemperature - (_v / this.specificHeat);
+              _dot.setTemperature = _dot.getTemperature - (_v / _dot.specificHeat);
             }
           }
           
