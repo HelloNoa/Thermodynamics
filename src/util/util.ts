@@ -33,8 +33,10 @@ export function RandomTemperature() {
 
 export function RandomTemperatureColorHex(temperature: number = RandomTemperature()) {
   // 온도 범위 설정 (예: -20°C ~ 40°C)
-  const minTemp = -40;
-  const maxTemp = 100;
+  // const minTemp = -140;
+  // const maxTemp = 200;
+  const minTemp = -273;
+  const maxTemp = 10_000;
   
   // 온도를 0~1 사이의 값으로 정규화
   const normalizedTemp = Math.max(0, Math.min(1, (temperature - minTemp) / (maxTemp - minTemp)));
@@ -46,15 +48,27 @@ function valueToHeatmapColor(value:number, min = 0, max = 1) {
   // 값을 0-1 사이로 정규화
   const normalizedValue = Math.max(0, Math.min(1, (value - min) / (max - min)));
   
+  const normalized = (temp:number)=> {
+    const min = -273;
+    const max = 10_000;
+    return Math.max(0, Math.min(1, (temp - min) / (max - min)))
+  };
   // 색상 구간 정의
   const colors = [
-    { point: 0, r: 0, g: 0, b: 255 },     // 파란색
-    { point: 0.25, r: 0, g: 255, b: 255 }, // 청록색
-    { point: 0.5, r: 0, g: 255, b: 0 },    // 초록색
-    { point: 0.75, r: 255, g: 255, b: 0 }, // 노란색
-    { point: 1, r: 255, g: 0, b: 0 }       // 빨간색
+    { point: 0, r: 10, g: 10, b: 10 },     // 자주색
+    { point: normalized(-100), r: 102, g: 0, b: 153 },     // 자주색
+    { point: normalized(-50), r: 0, g: 0, b: 255 },     // 파란색
+    { point: normalized(-30), r: 0, g: 255, b: 255 }, // 청록색
+    { point: normalized(30), r: 0, g: 255, b: 0 },    // 초록색
+    { point: normalized(50), r: 255, g: 255, b: 0 }, // 노란색
+    { point: normalized(100), r: 255, g: 0, b: 0 },       // 빨간색
+    { point: 1, r: 220, g: 20, b: 60 },       // 빨간색
+    // { point: 1, r: 40, g: 17, b: 15 }       // 고동색
   ];
-  
+  //
+  // colors.map((color, index,arr) => {
+  //   arr[index].point = index/(arr.length)
+  // });
   // 현재 값이 속한 구간 찾기
   let i = 0;
   for (; i < colors.length - 1; i++) {
