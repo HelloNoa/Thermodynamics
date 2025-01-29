@@ -1,95 +1,120 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+import styles from './page.module.css';
+import React, { useEffect, useRef, useState } from 'react';
+import { Dot } from '@/app/script/Dot';
+import { Coordinate, Global } from '@/app/UserScript/main';
+import { Game } from '@/app/script/Game';
+import { MainRoom } from '@/app/UserScript/MainRoom';
+
 
 export default function Home() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const drawLine = (originalMousePosition: Coordinate, newMousePosition: Coordinate) => {
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    const context = canvas.getContext('2d', { alpha: false });
+    
+    // context.webkitImageSmoothingEnabled = false;
+    // context.mozImageSmoothingEnabled = false;
+    if (context) {
+      context.imageSmoothingEnabled = false;
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      // context.translate(.5, .5);
+      context.strokeStyle = 'red';
+      context.lineWidth = 1;
+      context.lineCap = 'butt';
+      context.lineJoin = 'miter';
+      // context.imageSmoothingEnabled = false;
+      
+      context.beginPath();
+      context.moveTo(originalMousePosition.x, originalMousePosition.y);
+      context.lineTo(newMousePosition.x, newMousePosition.y);
+      context.closePath();
+      
+      context.stroke();
+      
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.fillStyle = 'red';
+      context.fillRect(10, 10, 1, 1);
+    }
+  };
+  
+  const [degree, setDegree] = useState(0);
+  const [specificHeat, setSpecificHeat] = useState(0);
+  const [mousePosition, setMousePosition] = useState<Coordinate>({
+                                                                   x: 0,
+                                                                   y: 0
+                                                                 });
+  
+  useEffect(() => {
+    const cnv = canvasRef.current;
+    if (!cnv) {
+      return;
+    }
+    Global.canvas = canvasRef.current as HTMLCanvasElement;
+    Global.map = Array.from({ length: Global.canvas.width }, () => new Array(Global.canvas.height).fill(0));
+    
+    
+    const game = new Game();
+    game.gameTickSpeed = 100;
+    const _mainRoom = new MainRoom({ roomManager: game.RoomManager });
+    game.RoomManager.AddRoom({
+                               room: _mainRoom
+                             });
+    // _mainRoom.AddGameObject({ gameObject: dotList.dots });
+    game.RoomManager.CurrentRoom = _mainRoom;
+    
+  }, []);
+  
+  
+  useEffect(() => {
+    const updatedDegree = () => {
+      if (mousePosition.x < 0 || mousePosition.y < 0 || mousePosition.x >= Global.canvas.width || mousePosition.y >= Global.canvas.height) {
+        return;
+      }
+      const x = mousePosition.x;
+      const y = mousePosition.y;
+      // console.log(x,y)
+      // console.log(Global.canvas.getBoundingClientRect())
+      if (Global.map[x][y] instanceof Dot) {
+        const _t = 1;
+        const temp = (Global.map[x][y] as Dot).getTemperature;
+        setDegree(Math.floor(temp * _t) / _t);
+        const _specificHeat = (Global.map[x][y] as Dot).specificHeat;
+        setSpecificHeat(Math.floor(_specificHeat * _t) / _t);
+      }
+    };
+    const updatedDegreeId = setInterval(updatedDegree, 10);
+    return () => {
+      clearInterval(updatedDegreeId);
+    };
+  }, [mousePosition]);
+  
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+        <div id={styles.game}>
+          <canvas ref={canvasRef} width={'128px'} height={'128px'} style={{ 'imageRendering': 'pixelated' }}
+                  onMouseMove={e => {
+                    const _x = e.clientX - Global.canvas.getBoundingClientRect().left;
+                    const _y = e.clientY - Global.canvas.getBoundingClientRect().top;
+                    const transform = Global.canvas.getContext('2d')!.getTransform();
+                    // console.log(
+                    //   Math.floor((_x - transform.e) / transform.a / 6),
+                    //   Math.floor((_y - transform.f) / transform.d/6))
+                    const x = Math.floor((_x - transform.e) / transform.a / 6);
+                    const y = Math.floor((_y - transform.f) / transform.d / 6);
+                    setMousePosition({
+                                       x,
+                                       y
+                                     });
+                  }}>
+          </canvas>
+          <p className={styles.degree}>{degree.toLocaleString()}°C <br/>{specificHeat.toLocaleString()}J/kg·℃</p>
         </div>
       </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
