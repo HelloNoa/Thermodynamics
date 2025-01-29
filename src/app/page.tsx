@@ -61,25 +61,37 @@ export default function Home() {
     };
   }, [mousePosition]);
   
+  const Move = (e: TouchEvent | MouseEvent) => {
+    let _x;
+    let _y;
+    if ((e as TouchEvent).touches) {
+      e = e as TouchEvent;
+      _x = e.touches[0].clientX - Global.canvas.getBoundingClientRect().left;
+      _y = e.touches[0].clientY - Global.canvas.getBoundingClientRect().top;
+    } else {
+      e = e as MouseEvent;
+      _x = e.clientX - Global.canvas.getBoundingClientRect().left;
+      _y = e.clientY - Global.canvas.getBoundingClientRect().top;
+    }
+    const transform = Global.canvas.getContext('2d')!.getTransform();
+    // console.log(
+    //   Math.floor((_x - transform.e) / transform.a / 6),
+    //   Math.floor((_y - transform.f) / transform.d/6))
+    const _temp = Global.canvas.clientWidth / Global.canvas.width;
+    const x = Math.floor((_x - transform.e) / transform.a / _temp);
+    const y = Math.floor((_y - transform.f) / transform.d / _temp);
+    setMousePosition({
+                       x,
+                       y
+                     });
+  };
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <div id={styles.game}>
           <canvas ref={canvasRef} width={'128px'} height={'128px'} style={{ 'imageRendering': 'pixelated' }}
-                  onMouseMove={e => {
-                    const _x = e.clientX - Global.canvas.getBoundingClientRect().left;
-                    const _y = e.clientY - Global.canvas.getBoundingClientRect().top;
-                    const transform = Global.canvas.getContext('2d')!.getTransform();
-                    // console.log(
-                    //   Math.floor((_x - transform.e) / transform.a / 6),
-                    //   Math.floor((_y - transform.f) / transform.d/6))
-                    const x = Math.floor((_x - transform.e) / transform.a / 6);
-                    const y = Math.floor((_y - transform.f) / transform.d / 6);
-                    setMousePosition({
-                                       x,
-                                       y
-                                     });
-                  }}>
+                  onTouchMove={Move as () => void}
+                  onMouseMove={Move as () => void}>
           </canvas>
           <p className={styles.degree}>{degree.toLocaleString()}°C <br/>{specificHeat.toLocaleString()}J/kg·℃</p>
         </div>
