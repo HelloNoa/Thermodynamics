@@ -9,37 +9,6 @@ import { MainRoom } from '@/app/UserScript/MainRoom';
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const drawLine = (originalMousePosition: Coordinate, newMousePosition: Coordinate) => {
-    if (!canvasRef.current) {
-      return;
-    }
-    const canvas: HTMLCanvasElement = canvasRef.current;
-    const context = canvas.getContext('2d', { alpha: false });
-    
-    // context.webkitImageSmoothingEnabled = false;
-    // context.mozImageSmoothingEnabled = false;
-    if (context) {
-      context.imageSmoothingEnabled = false;
-      context.setTransform(1, 0, 0, 1, 0, 0);
-      // context.translate(.5, .5);
-      context.strokeStyle = 'red';
-      context.lineWidth = 1;
-      context.lineCap = 'butt';
-      context.lineJoin = 'miter';
-      // context.imageSmoothingEnabled = false;
-      
-      context.beginPath();
-      context.moveTo(originalMousePosition.x, originalMousePosition.y);
-      context.lineTo(newMousePosition.x, newMousePosition.y);
-      context.closePath();
-      
-      context.stroke();
-      
-      context.setTransform(1, 0, 0, 1, 0, 0);
-      context.fillStyle = 'red';
-      context.fillRect(10, 10, 1, 1);
-    }
-  };
   
   const [degree, setDegree] = useState(0);
   const [specificHeat, setSpecificHeat] = useState(0);

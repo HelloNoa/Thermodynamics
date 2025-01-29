@@ -1,6 +1,5 @@
 import { GameObject } from '@/app/script/GameObject';
 import { Game } from '@/app/script/Game';
-import { clearInterval } from 'node:timers';
 
 export class RoomManager<T extends Room> {
   private RoomList: T[] = [];

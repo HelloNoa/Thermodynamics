@@ -1,5 +1,3 @@
-import { Coordinate } from '@/app/UserScript/main';
-
 export function Clamp(number: number, min: number, max: number) {
   return Math.max(min, Math.min(number, max));
 }

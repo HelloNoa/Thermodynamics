@@ -1,5 +1,5 @@
 import { Room, RoomManager } from '@/app/script/Room';
-import { Global } from '@/app/UserScript/main';
+import { Coordinate, Global } from '@/app/UserScript/main';
 import { Dot } from '@/app/script/Dot';
 
 export class MainRoom extends Room {
@@ -118,8 +118,8 @@ export class MainRoom extends Room {
   
   private addDotByCount(count: number) {
     let isFull = true;
-    Global.map.forEach((row, x) => {
-      row.forEach((cell, y) => {
+    Global.map.forEach((row) => {
+      row.forEach((cell) => {
         if (!(cell instanceof Dot)) {
           isFull = false;
         }
@@ -143,4 +143,33 @@ export class MainRoom extends Room {
       }
     }
   }
+  
+  drawLine = (originalMousePosition: Coordinate, newMousePosition: Coordinate) => {
+    const canvas: HTMLCanvasElement = Global.canvas;
+    const context = canvas.getContext('2d', { alpha: false });
+    
+    // context.webkitImageSmoothingEnabled = false;
+    // context.mozImageSmoothingEnabled = false;
+    if (context) {
+      context.imageSmoothingEnabled = false;
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      // context.translate(.5, .5);
+      context.strokeStyle = 'red';
+      context.lineWidth = 1;
+      context.lineCap = 'butt';
+      context.lineJoin = 'miter';
+      // context.imageSmoothingEnabled = false;
+      
+      context.beginPath();
+      context.moveTo(originalMousePosition.x, originalMousePosition.y);
+      context.lineTo(newMousePosition.x, newMousePosition.y);
+      context.closePath();
+      
+      context.stroke();
+      
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.fillStyle = 'red';
+      context.fillRect(10, 10, 1, 1);
+    }
+  };
 }
